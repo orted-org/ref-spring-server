@@ -1,13 +1,13 @@
-package orted.firebasejwt.service;
+package orted.firebasejwt.services;
 
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import orted.firebasejwt.entity.CustomUserForContext;
+import orted.firebasejwt.entities.CustomUserForContext;
+import orted.firebasejwt.exceptions.UnauthorizedException;
 
 import java.util.ArrayList;
 
@@ -32,10 +32,13 @@ public class FirebaseAuthenticationProvider implements AuthenticationProvider {
         // TODO :- validate id token with firebase admin sdk
         // TODO :- check and complete user info in db
         // TODO :- put the relevant data in context/or we can directly return from here and handle there
+        // TODO :- incase of invalid id_token throw an Error of UnauthorizedException type
+
 
         CustomUserForContext user = new CustomUserForContext("123", "govind", "myBusiness");
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user, id_token, new ArrayList<>());
-        // SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
         return usernamePasswordAuthenticationToken;
     }
 

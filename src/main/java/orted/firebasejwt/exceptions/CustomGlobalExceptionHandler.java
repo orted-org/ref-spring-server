@@ -1,4 +1,4 @@
-package orted.firebasejwt.exception;
+package orted.firebasejwt.exceptions;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -9,12 +9,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
@@ -59,11 +57,11 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return new ResponseEntity<GlobalExceptionResponse>(response, HttpStatus.UNAUTHORIZED);
     }
 
-
-
-
-
-
+    @Override
+    protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        GlobalExceptionResponse response=new GlobalExceptionResponse(status, "No route exists for this");
+        return new ResponseEntity<Object>(response, status);
+    }
 
 
 

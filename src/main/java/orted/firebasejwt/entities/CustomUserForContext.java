@@ -1,4 +1,4 @@
-package orted.firebasejwt.entity;
+package orted.firebasejwt.entities;
 
 public class CustomUserForContext {
     private String phone;

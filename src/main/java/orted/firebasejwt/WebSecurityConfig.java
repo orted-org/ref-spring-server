@@ -8,13 +8,20 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import orted.firebasejwt.service.FirebaseAuthenticationProvider;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import orted.firebasejwt.exceptions.CustomAccessDenied;
+import orted.firebasejwt.exceptions.CustomUnauthorizedInFilter;
+import orted.firebasejwt.filters.JwtRequestFilter;
+import orted.firebasejwt.services.FirebaseAuthenticationProvider;
 
 @EnableWebSecurity
 class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private FirebaseAuthenticationProvider firebaseAuthenticationProvider;
+
+    @Autowired
+    private JwtRequestFilter jwtRequestFilter;
 
     @Bean
     @Override
@@ -27,14 +34,25 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider(firebaseAuthenticationProvider);
     }
 
-
+    /*
+        if there is some common path in url then keep more detailed one above
+        to function it correctly
+     */
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable()
-                .authorizeRequests().antMatchers("/authenticate").permitAll().
-                anyRequest().authenticated().and().
-                exceptionHandling().and().sessionManagement()
+                .authorizeRequests()
+                .antMatchers("/v1/auth/authenticate").permitAll()
+                .antMatchers("/v1/admin/**").hasAnyAuthority("admin")
+                .antMatchers("/v1/user/**").hasAnyAuthority("user", "admin")
+                .anyRequest().authenticated().and()
+        .exceptionHandling()
+                .authenticationEntryPoint(new CustomUnauthorizedInFilter())
+                .accessDeniedHandler(new CustomAccessDenied())
+                .and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
     }
 
 }

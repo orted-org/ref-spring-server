@@ -1,9 +1,5 @@
-package orted.firebasejwt.entity;
+package orted.firebasejwt.entities;
 
-import org.springframework.lang.NonNull;
-import org.springframework.validation.annotation.Validated;
-
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
